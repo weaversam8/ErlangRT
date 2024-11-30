@@ -15,7 +15,7 @@ edition = "2018"
 # Add "trace_beam_loader" to print code loading debugging info
 [features]
 default = [
-    "r22",
+    "r27",
     "fancy_string_quotes",
     "trace_opcode_execution",
     "trace_register_changes",
@@ -24,7 +24,7 @@ default = [
 #    "trace_comparisons",
 #   "trace_calls",
 ]
-r22 = []
+r27 = []
 trace_opcode_execution = []
 trace_register_changes = []
 trace_stack_changes = []
@@ -40,9 +40,8 @@ clippy = {version = "0.0.302", optional = true}
 colored = "2.0.0" # console colors (TTY systems)
 compress = "0.2.1" # depends on `num`; TODO: use libflate
 lazy_static = "1.4.0"
-ramp = "0.7.0" # Rust multiprecision arithmetics
+# ramp = "0.7.0" # Rust multiprecision arithmetics
 byteorder = "1.4.3"
-failure = "0.1.8"
 
 [profile.dev]
 panic = "unwind"

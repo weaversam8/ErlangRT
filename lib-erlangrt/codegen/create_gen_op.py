@@ -5,7 +5,7 @@ import erlangrt.genop as genop
 
 
 def main():
-    conf = genop.OTP22()
+    conf = genop.OTP27()
     tables = genop.OTPTables(conf)
 
     print("""\

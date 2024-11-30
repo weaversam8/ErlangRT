@@ -20,6 +20,9 @@ pub fn start_emulator(args: &mut ErlStartArgs) {
   if cfg!(feature = "r22") {
     println!("Erlang Runtime (compat OTP 22)");
   }
+  if cfg!(feature = "r27") {
+    println!("Erlang Runtime (compat OTP 27)");
+  }
 
   let mut beam_vm = VM::new(args);
 

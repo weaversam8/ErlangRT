@@ -3,6 +3,7 @@
 
 /.idea
 /*.iml
+.tool-versions
 
 # Common Test artifacts
 *.html
