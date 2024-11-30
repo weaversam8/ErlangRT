@@ -73,6 +73,8 @@ pub fn decode_naked(r: &mut BinaryReader, hp: &mut dyn THeap) -> RtResult<Term> 
 
     x if x == Tag::AtomDeprecated as u8 => decode_atom_latin1(r, hp),
 
+    x if x == Tag::SmallAtomUtf8 as u8 => decode_sm_atom_utf8(r, hp),
+
     x if x == Tag::SmallInteger as u8 => decode_u8(r, hp),
 
     x if x == Tag::Integer as u8 => decode_s32(r, hp),
@@ -172,6 +174,12 @@ fn decode_s32(r: &mut BinaryReader, _hp: &mut dyn THeap) -> RtResult<Term> {
 fn decode_atom_latin1(r: &mut BinaryReader, _hp: &mut dyn THeap) -> RtResult<Term> {
   let sz = r.read_u16be();
   let val = r.read_str_latin1(sz as Word).unwrap();
+  Ok(atom::from_str(&val))
+}
+
+fn decode_sm_atom_utf8(r: &mut BinaryReader, _hp: &mut dyn THeap) -> RtResult<Term> {
+  let sz = r.read_u8();
+  let val = r.read_str_utf8(sz as Word).unwrap();
   Ok(atom::from_str(&val))
 }
 
