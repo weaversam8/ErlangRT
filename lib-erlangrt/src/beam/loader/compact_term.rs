@@ -38,13 +38,23 @@ enum CteExtTag {
 }
 
 // In OTP20 the Float Ext tag is gone and Lists are taking the first value
-#[cfg(not(feature = "r19"))]
+#[cfg(any(feature = "r20", feature = "r21", feature = "r22"))]
 #[repr(u8)]
 enum CteExtTag {
   List = 0b0001_0111,
   FloatReg = 0b0010_0111,
   AllocList = 0b0011_0111,
   Literal = 0b0100_0111,
+}
+
+#[cfg(any(feature = "r25", feature = "r26", feature = "r27"))]
+#[repr(u8)]
+enum CteExtTag {
+  List = 0b0001_0111,
+  FloatReg = 0b0010_0111,
+  AllocList = 0b0011_0111,
+  Literal = 0b0100_0111,
+  RegTypeHint = 0b0101_0111,
 }
 
 /// This defines how the read code will handle `CteExtTag::List`, either a jump
@@ -175,7 +185,7 @@ impl CompactTermReader {
     }
   }
 
-  #[cfg(not(feature = "r19"))]
+  #[cfg(any(feature = "r20", feature = "r21", feature = "r22"))]
   fn parse_ext_tag(&mut self, reader: &mut BinaryReader, b: u8) -> RtResult<Term> {
     match b {
       x if x == CteExtTag::List as u8 => match self.mode {
@@ -192,6 +202,31 @@ impl CompactTermReader {
       }
       x if x == CteExtTag::FloatReg as u8 => self.parse_ext_fpreg(reader),
       x if x == CteExtTag::Literal as u8 => self.parse_ext_literal(reader),
+      other => {
+        let msg = format!("Ext tag {other} unknown");
+        Self::make_err(CompactTermError::ExtendedTag(msg))
+      }
+    }
+  }
+
+  #[cfg(any(feature = "r25", feature = "r26", feature = "r27"))]
+  fn parse_ext_tag(&mut self, reader: &mut BinaryReader, b: u8) -> RtResult<Term> {
+    match b {
+      x if x == CteExtTag::List as u8 => match self.mode {
+        ListParseMode::AsJumpTable => self.parse_list_as_jump_table(reader),
+        ListParseMode::AsTuple2Initializer => {
+          self.parse_list_as_tuple_initializer(reader)
+        }
+      },
+
+      // float does not exist after R19
+      // x if x == CTEExtTag::Float as u8 => parse_ext_float(hp, r),
+      x if x == CteExtTag::AllocList as u8 => {
+        panic!("Don't know how to decode an alloclist");
+      }
+      x if x == CteExtTag::FloatReg as u8 => self.parse_ext_fpreg(reader),
+      x if x == CteExtTag::Literal as u8 => self.parse_ext_literal(reader),
+      x if x == CteExtTag::RegTypeHint as u8 => self.parse_reg_type_hint(reader),
       other => {
         let msg = format!("Ext tag {other} unknown");
         Self::make_err(CompactTermError::ExtendedTag(msg))
@@ -261,6 +296,24 @@ impl CompactTermReader {
     }
 
     Ok(Term::make_boxed(jt))
+  }
+
+  /// Parses an X or Y register annotated with type information. This feature
+  /// was added in OTP 25.
+  #[cfg(any(feature = "r25", feature = "r26", feature = "r27"))]
+  fn parse_reg_type_hint(&mut self, reader: &mut BinaryReader) -> RtResult<Term> {
+    // The first element will be a normal X or Y register, so it can be read as
+    // normal:
+    let reg = self.read(reader)?;
+
+    // The second element will be a smallint, which I think is an index into
+    // the type chunk of the file. This chunk is currently ignored, so we can
+    // throw out this value.
+    let b = reader.read_u8();
+    let _tag: u8 = b & 0b111;
+    let _type_idx = self.read_word(reader, b)?;
+
+    Ok(reg)
   }
 
   /// Assume that the stream contains a tagged small integer (check the tag!)
