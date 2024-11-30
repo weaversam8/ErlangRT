@@ -15,7 +15,7 @@ edition = "2018"
 # Add "trace_beam_loader" to print code loading debugging info
 [features]
 default = [
-    "r27",
+    "r25",
     "fancy_string_quotes",
     "trace_opcode_execution",
     "trace_register_changes",
@@ -24,7 +24,7 @@ default = [
 #    "trace_comparisons",
 #   "trace_calls",
 ]
-r27 = []
+r25 = []
 trace_opcode_execution = []
 trace_register_changes = []
 trace_stack_changes = []

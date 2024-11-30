@@ -15,7 +15,7 @@ class AddAtom:
 
 
 def main():
-    conf = genop.OTP27()
+    conf = genop.OTP25()
     tables = genop.OTPTables(conf)
 
     print("""\
