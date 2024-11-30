@@ -1,7 +1,7 @@
 .PHONY: build codegen ct submodule otp
 
 build: otp codegen
-	cargo +nightly build
+	cargo build
 
 build_tests: submodule
 	cd priv && $(MAKE)
@@ -13,10 +13,10 @@ ct: build
 	mkdir tmp; cd tmp && ../target/debug/ct_run 1 2 3 -erl_args 4 5 6
 
 run: build build_tests
-	cargo +nightly run --bin erlexec
+	cargo run --bin erlexec
 
 test: build build_tests
-	RUST_BACKTRACE=1 cargo +nightly run --bin ct_run
+	RUST_BACKTRACE=1 cargo run --bin ct_run
 
 # Graphical user inteface for GDB - Gede
 .PHONY: test-gede
