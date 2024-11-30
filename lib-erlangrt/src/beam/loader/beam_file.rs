@@ -116,6 +116,8 @@ impl BeamFile {
 
         "Dbgi" | // skip debug info
         "StrT" | // skip strings TODO load strings?
+        "Meta" | // skip meta chunk (features used when compiling)
+        "Type" | // skip type information (for now)
         "Abst" => r.skip(chunk_sz as usize), // skip abstract code
 
         other => {
