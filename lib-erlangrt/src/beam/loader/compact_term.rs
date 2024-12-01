@@ -10,7 +10,7 @@ use crate::{
   rt_util::bin_reader::BinaryReader,
   term::{
     boxed::{self, bignum::sign::Sign, endianness::Endianness},
-    term_builder::TupleBuilder,
+    term_builder::{TupleBuilder, ListBuilder},
     Term,
   },
 };
@@ -55,6 +55,14 @@ enum CteExtTag {
   AllocList = 0b0011_0111,
   Literal = 0b0100_0111,
   RegTypeHint = 0b0101_0111,
+}
+
+// Different types 
+#[repr(isize)]
+enum CteAllocListType {
+  Words = 0,
+  Floats = 1,
+  Funs = 2,
 }
 
 /// This defines how the read code will handle `CteExtTag::List`, either a jump
@@ -175,9 +183,7 @@ impl CompactTermReader {
       x if x == CteExtTag::Float as u8 => self.parse_ext_float(),
       x if x == CteExtTag::FloatReg as u8 => self.parse_ext_fpreg(reader),
       x if x == CteExtTag::Literal as u8 => self.parse_ext_literal(reader),
-      x if x == CteExtTag::AllocList as u8 => {
-        panic!("Don't know how to decode an alloclist")
-      }
+      x if x == CteExtTag::AllocList as u8 => self.parse_alloc_list(reader),
       other => make_err(CompactTermError::ExtendedTag(format!(
         "Ext tag {} unknown",
         other
@@ -197,9 +203,7 @@ impl CompactTermReader {
 
       // float does not exist after R19
       // x if x == CTEExtTag::Float as u8 => parse_ext_float(hp, r),
-      x if x == CteExtTag::AllocList as u8 => {
-        panic!("Don't know how to decode an alloclist");
-      }
+      x if x == CteExtTag::AllocList as u8 => self.parse_alloc_list(reader),
       x if x == CteExtTag::FloatReg as u8 => self.parse_ext_fpreg(reader),
       x if x == CteExtTag::Literal as u8 => self.parse_ext_literal(reader),
       other => {
@@ -221,9 +225,7 @@ impl CompactTermReader {
 
       // float does not exist after R19
       // x if x == CTEExtTag::Float as u8 => parse_ext_float(hp, r),
-      x if x == CteExtTag::AllocList as u8 => {
-        panic!("Don't know how to decode an alloclist");
-      }
+      x if x == CteExtTag::AllocList as u8 => self.parse_alloc_list(reader),
       x if x == CteExtTag::FloatReg as u8 => self.parse_ext_fpreg(reader),
       x if x == CteExtTag::Literal as u8 => self.parse_ext_literal(reader),
       x if x == CteExtTag::RegTypeHint as u8 => self.parse_reg_type_hint(reader),
@@ -296,6 +298,56 @@ impl CompactTermReader {
     }
 
     Ok(Term::make_boxed(jt))
+  }
+
+  /// Parses an allocation list (used to specify how much memory to allocate)
+  fn parse_alloc_list(&mut self, reader: &mut BinaryReader) -> RtResult<Term> {
+    // First, get the length, which should be a tag_u with a value of 3
+    let len = self.read_int(reader)?;
+    assert_eq!(len, 3, "compact_term: AllocList length must be 3");
+
+    let mut lb = ListBuilder::new()?;
+
+    // Next, parse the three values
+    for _i in 0..len {
+      // Read the type within the list
+      let t = self.read_int(reader)?;
+      match t {
+        x if x == CteAllocListType::Words as isize => {
+          let n_words = self.read_int(reader)?;
+          unsafe {
+            // TODO: I'm not positive this is right, I think element 0 should be an atom.
+            // Leaving it be for now until I can get a little further along in the load
+            // process.
+            let tb = TupleBuilder::with_arity(2, &mut (*self.heap))?;
+            tb.set_element(0, Term::make_small_signed(CteAllocListType::Words as isize));
+            tb.set_element(1, Term::make_small_signed(n_words));
+            lb.append(tb.make_term(), &mut (*self.heap))?;
+          }
+        }
+        x if x == CteAllocListType::Floats as isize => {
+          let n_floats = self.read_int(reader)?;
+          unsafe {
+            let tb = TupleBuilder::with_arity(2, &mut (*self.heap))?;
+            tb.set_element(0, Term::make_small_signed(CteAllocListType::Floats as isize));
+            tb.set_element(1, Term::make_small_signed(n_floats));
+            lb.append(tb.make_term(), &mut (*self.heap))?;
+          }
+        }
+        x if x == CteAllocListType::Funs as isize => {
+          let n_funs = self.read_int(reader)?;
+          unsafe {
+            let tb = TupleBuilder::with_arity(2, &mut (*self.heap))?;
+            tb.set_element(0, Term::make_small_signed(CteAllocListType::Funs as isize));
+            tb.set_element(1, Term::make_small_signed(n_funs));
+            lb.append(tb.make_term(), &mut (*self.heap))?;
+          }
+        }
+        t => panic!("compact_term: AllocList unknown type {}", t),
+      }
+    }
+    
+    Ok(lb.make_term())
   }
 
   /// Parses an X or Y register annotated with type information. This feature
