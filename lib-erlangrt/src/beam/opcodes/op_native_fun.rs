@@ -1,5 +1,7 @@
 //! Module implements opcodes related to calling built-in functions (BIF).
 
+use log::debug;
+
 use crate::{
   beam::disp_result::DispatchResult,
   emulator::{
@@ -32,7 +34,7 @@ impl OpcodeBif0 {
     dst: Term,
   ) -> RtResult<DispatchResult> {
     // NOTE: bif0 cannot fail (fail_label=NIL)
-    println!("bif0 target={target} dst={dst}");
+    debug!("bif0 target={target} dst={dst}");
     let cb_target = call_native_fun::CallBifTarget::ImportTerm(target);
     call_native_fun::find_and_call_native_fun(
       vm,

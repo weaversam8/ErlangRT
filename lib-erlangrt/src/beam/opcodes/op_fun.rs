@@ -1,4 +1,6 @@
 //! Module implements opcodes related to function objects/lambdas.
+use log::trace;
+
 use crate::{
   beam::disp_result::DispatchResult,
   emulator::{
@@ -149,7 +151,7 @@ fn fixed_apply(
     panic!("TODO special handling for apply on apply/3");
   }
 
-  println!("call_mfa {mfa}");
+  trace!("call_mfa {mfa}");
   let l_result = vm.code_server.lookup_mfa(mfa, true);
   if l_result.is_err() {
     return fail::create::undef();

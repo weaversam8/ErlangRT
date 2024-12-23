@@ -14,6 +14,8 @@ pub mod op_try_catch;
 pub mod op_tuple;
 pub mod op_type_checks;
 
+use log::debug;
+
 pub use crate::beam::opcodes::{
   binary::*, op_data::*, op_execution::*, op_fun::*, op_list::*, op_memory::*,
   op_message::*, op_native_fun::*, op_predicates::*, op_try_catch::*, op_tuple::*,
@@ -49,7 +51,7 @@ pub fn assert_arity(op: RawOpcode, code_expected_arity: Word) {
 
 /// Display an error about opcode not supported/not implemented.
 pub fn unknown_opcode(op: RawOpcode, ctx: &RuntimeContext) {
-  println!("{ctx}");
+  debug!("{ctx}");
   panic!(
     "vm_dispatch: Opcode {:?} '{}' not implemented",
     op.get(),

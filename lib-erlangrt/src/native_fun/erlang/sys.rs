@@ -1,3 +1,5 @@
+use log::debug;
+
 use crate::{
   defs::exc_type::ExceptionType,
   emulator::{gen_atoms, heap::THeapOwner, process::Process},
@@ -56,7 +58,7 @@ define_nativefun!(_vm, _proc, args,
 define_nativefun!(_vm, _proc, args,
   name: "erlang:load_nif/2", struct_name: NfErlangLoadNif2, arity: 2,
   invoke: {
-    println!("load_nif({path}, {load_info}) - doing nothing");
+    debug!("load_nif({path}, {load_info}) - doing nothing");
     Ok(gen_atoms::OK)
   },
   args: list(path), term(load_info),

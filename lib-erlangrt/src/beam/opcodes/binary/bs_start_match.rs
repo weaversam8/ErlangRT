@@ -1,3 +1,5 @@
+use log::debug;
+
 use crate::{
   beam::disp_result::DispatchResult,
   emulator::{heap::THeapOwner, process::Process, runtime_ctx::*},
@@ -39,7 +41,7 @@ impl OpcodeBsStartMatch3 {
     live: usize,
     dst: Term,
   ) -> RtResult<DispatchResult> {
-    println!("bs_start_match3 {fail}, context={match_context}, live={live}, dst={dst}");
+    debug!("bs_start_match3 {fail}, context={match_context}, live={live}, dst={dst}");
 
     // Must be either a binary or a binary_match_context
     if !match_context.is_boxed() {

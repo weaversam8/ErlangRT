@@ -1,5 +1,7 @@
 use core::cmp::Ordering;
 
+use log::debug;
+
 use crate::{
   defs::{Word, SizeWords},
   emulator::heap::{AllocInit, THeap},
@@ -143,7 +145,7 @@ impl Map {
 
     // Binary search goes here
     // Assuming: Keys are sorted in ascending order
-    println!("map:get size={count} key={key}");
+    debug!("map:get size={count} key={key}");
 
     if count == 0 {
       return Ok(MapGetResult::ClosestLarger(0));
@@ -155,7 +157,7 @@ impl Map {
       let median = a + (b - a) / 2;
       let median_value = p.add(median * 2).read();
       // The key is less than median, step left
-      println!("map:get a={a} b={b} median={median}");
+      debug!("map:get a={a} b={b} median={median}");
       match cmp_terms(median_value, key, true)? {
         Ordering::Less => {
           if a == b {

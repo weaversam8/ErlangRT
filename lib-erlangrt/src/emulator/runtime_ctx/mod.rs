@@ -3,6 +3,7 @@
 use core::{fmt, ptr, slice};
 
 use colored::Colorize;
+use log::debug;
 
 use crate::{
   beam::gen_op,
@@ -85,12 +86,12 @@ impl RuntimeContext {
   #[inline]
   pub fn return_and_clear_cp(&mut self, proc: &Process) -> ReturnResult {
     if cfg!(feature = "trace_calls") {
-      println!("{} x0={}", "Return:".yellow(), self.get_x(0));
+      debug!("{} x0={}", "Return:".yellow(), self.get_x(0));
     }
     if self.cp.is_null() {
       if proc.get_heap().stack_depth() == 0 {
         // Process end of life: return on empty stack
-        println!(
+        debug!(
           "Process {} end of life (return on empty stack) x0={}",
           proc.pid,
           self.get_x(0)
@@ -121,7 +122,7 @@ impl RuntimeContext {
   #[inline]
   pub fn set_x(&mut self, index: usize, val: Term) {
     if cfg!(feature = "trace_register_changes") {
-      println!("{}{} = {}", "set x".blue(), index, val);
+      debug!("{}{} = {}", "set x".blue(), index, val);
     }
     // debug_assert!(val.is_value(), "Should never set x[] to a #Nonvalue<>");
     self.regs[index] = val;
@@ -301,7 +302,7 @@ impl RuntimeContext {
   #[inline]
   pub fn jump(&mut self, cp: Term) {
     debug_assert!(cp.is_cp());
-    println!("{} {:p}", "jump to".purple(), cp.get_cp_ptr::<Word>());
+    debug!("{} {:p}", "jump to".purple(), cp.get_cp_ptr::<Word>());
     self.ip = CodePtr::from_cp(cp);
   }
 
@@ -309,7 +310,7 @@ impl RuntimeContext {
   pub fn jump_ptr(&mut self, code_ptr: *const Word) {
     debug_assert!(!code_ptr.is_null(), "Jumping to NULL is a bad idea");
     if cfg!(feature = "trace_opcode_execution") {
-      println!("{} {:p}", "jump to".purple(), code_ptr);
+      debug!("{} {:p}", "jump to".purple(), code_ptr);
     }
     self.ip = CodePtr::from_ptr(code_ptr);
   }
@@ -342,12 +343,12 @@ impl RuntimeContext {
   #[allow(dead_code)]
   pub fn dump_registers(&self, arity: usize) {
     if arity == 0 {
-      println!("registers: empty");
+      debug!("registers: empty");
       return;
     }
 
     for i in 0..arity {
-      println!("reg X[{}] = {}", i, self.get_x(i));
+      debug!("reg X[{}] = {}", i, self.get_x(i));
     }
   }
 

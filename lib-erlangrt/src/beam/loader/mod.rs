@@ -16,6 +16,8 @@ mod impl_setup_imports;
 mod impl_stage2;
 mod load_time_structs;
 
+use log::debug;
+
 use crate::{
   beam::loader::beam_file::BeamFile,
   defs::Word,
@@ -131,6 +133,8 @@ impl LoaderState {
   /// return a reference counted pointer to it. VM (the caller) is responsible
   /// for adding the module to its code registry.
   pub fn load_finalize(&mut self) -> RtResult<Box<Module>> {
+    debug!("load_finalize");
+
     let mut newmod = match &self.name {
       Some(mod_id) => Box::new(module::Module::new(mod_id)),
       None => panic!("{}mod_id must be set at this point", module()),
@@ -215,7 +219,7 @@ pub fn load_module(
   code_srv: &mut CodeServer,
   mod_file_path: &PathBuf,
 ) -> RtResult<Box<Module>> {
-  rtdbg!("BEAM loader: from {}", mod_file_path.to_str().unwrap());
+  rtdbg!("BEAM loader: loading from {}", mod_file_path.to_str().unwrap());
 
   // Preload data structures
   // located in impl_read_chunks.rs

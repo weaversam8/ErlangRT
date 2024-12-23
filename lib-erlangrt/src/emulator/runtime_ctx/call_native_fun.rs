@@ -1,3 +1,5 @@
+use log::trace;
+
 use super::RuntimeContext;
 use crate::{
   beam::disp_result::DispatchResult,
@@ -49,7 +51,7 @@ pub fn find_and_call_native_fun(
   target: CallBifTarget,
   args: &[Term],
   dst: Term,
-  _gc: bool,
+  gc: bool,
 ) -> RtResult<DispatchResult> {
   // Try resolve BIF destination, which can be defined by an import, mfarity
   // a pointer to import, or a pointer to native_fun function.
@@ -102,12 +104,12 @@ pub fn find_and_call_native_fun(
       Err(bif_result.unwrap_err())
     }
     Ok(val) => {
-      //  println!(
-      //    "call_native_fun a={} gc={} call result {}",
-      //    args.len(),
-      //    gc,
-      //    val
-      //  );
+       trace!(
+         "call_native_fun a={} gc={} call result {}",
+         args.len(),
+         gc,
+         val
+       );
       // if dst is not NIL, store the result in it
       if dst != Term::nil() {
         ctx.store_value(val, dst, curr_p.get_heap_mut())?;

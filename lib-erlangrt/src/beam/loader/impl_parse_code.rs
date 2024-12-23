@@ -1,3 +1,5 @@
+use log::{debug, trace};
+
 use crate::{
   beam::{
     gen_op,
@@ -52,6 +54,8 @@ impl LoaderState {
   /// transferred to the VM, we can now parse opcodes and their args.
   /// 'drained_code' is 'raw_code' moved out of 'self'
   pub fn parse_raw_code(&mut self) -> RtResult<()> {
+    debug!("parse_raw_code");
+
     // Dirty swap to take raw_code out of self and give it to the binary reader
     let mut raw_code: Vec<u8> = Vec::new();
     core::mem::swap(&mut self.beam_file.code, &mut raw_code);

@@ -1,5 +1,7 @@
 //! `module` module handles Erlang modules as collections of functions,
 //! literals and attributes.
+use log::trace;
+
 use crate::{
   defs::{Word, WORD_BYTES},
   emulator::{
@@ -70,7 +72,7 @@ impl Module {
     assert_eq!(self.name(), mfa.m);
 
     let fa = mfa.get_funarity();
-    // println!("mod Lookup {}/{}", fa.f, fa.arity);
+    trace!("mod Lookup {}/{}", fa.f, fa.arity);
     self.lookup_fa(&fa)
   }
 

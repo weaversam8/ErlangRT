@@ -1,3 +1,5 @@
+use log::debug;
+
 use super::RuntimeContext;
 use crate::{
   beam::disp_result::DispatchResult,
@@ -37,11 +39,10 @@ pub fn apply(
   }
 
   ctx.live = actual_call_arity;
-  println!("{ctx}");
+  debug!("{ctx}");
 
   if actual_call_arity != closure_arity as Arity {
-    println!("{}badarity call_arity={closure_arity} nfrozen={closure_nfrozen} args_len={args_len}",
-             module());
+    debug!("badarity call_arity={closure_arity} nfrozen={closure_nfrozen} args_len={args_len}");
     return fail::create::badarity();
   }
 

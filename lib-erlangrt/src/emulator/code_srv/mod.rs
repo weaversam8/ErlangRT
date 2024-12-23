@@ -1,6 +1,8 @@
 //! Code server loads modules and stores them in memory, handles code lookups
 //! as well as dynamic reloading and partial unloading.
 
+use log::debug;
+
 use crate::{
   beam::loader,
   command_line_args::ErlStartArgs,
@@ -205,7 +207,7 @@ fn first_exists_in_search_path(search_paths: &[String], filename: &str) -> Optio
     if p.exists() {
       return Some(p.to_path_buf());
     }
-    println!("Tried {full_path}: not found");
+    debug!("Tried {full_path}: not found");
   }
   None
 }

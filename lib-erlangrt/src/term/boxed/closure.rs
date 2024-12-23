@@ -1,3 +1,5 @@
+use log::debug;
+
 use crate::{
   defs::{Arity, SizeBytes, Word, SizeWords},
   emulator::{
@@ -81,9 +83,8 @@ impl Closure {
     let this = hp.alloc(n_words, AllocInit::Uninitialized)? as *mut Self;
 
     assert_eq!(frozen.len(), fun_entry.nfrozen);
-    println!(
-      "{}new closure: {} frozen={} nfrozen={}",
-      module(),
+    debug!(
+      "new closure: {} frozen={} nfrozen={}",
       fun_entry.mfa,
       frozen.len(),
       fun_entry.nfrozen

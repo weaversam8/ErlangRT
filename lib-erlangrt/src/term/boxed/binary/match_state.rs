@@ -1,3 +1,5 @@
+use log::error;
+
 use crate::{
   defs::{BitSize, SizeBytes, SizeWords},
   emulator::heap::{AllocInit, THeap},
@@ -54,7 +56,7 @@ impl TBoxed for BinaryMatchState {
 
 impl BinaryMatchState {
   pub fn reset(&mut self) {
-    println!("TODO: reset binary match state");
+    error!("TODO: reset binary match state");
   }
 
   fn storage_size() -> SizeWords {

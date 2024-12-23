@@ -1,3 +1,5 @@
+use log::debug;
+
 use super::RuntimeContext;
 use crate::{
   beam::disp_result::DispatchResult,
@@ -31,9 +33,8 @@ pub fn apply(
 
   let mfa = unsafe { (*export).exp.mfa };
   if mfa.arity != arity as Arity {
-    println!(
-      "{}badarity target_arity={} expected_arity={}",
-      module(),
+    debug!(
+      "badarity target_arity={} expected_arity={}",
       mfa.arity,
       arity
     );

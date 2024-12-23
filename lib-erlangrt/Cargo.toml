@@ -42,6 +42,8 @@ compress = "0.2.1" # depends on `num`; TODO: use libflate
 lazy_static = "1.4.0"
 # ramp = "0.7.0" # Rust multiprecision arithmetics
 byteorder = "1.4.3"
+log = "0.4"
+env_logger = "0.9"
 
 [profile.dev]
 panic = "unwind"

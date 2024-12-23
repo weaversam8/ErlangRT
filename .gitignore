@@ -3,6 +3,7 @@
 
 /.idea
 /*.iml
+.DS_Store
 
 # Common Test artifacts
 *.html

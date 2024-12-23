@@ -1,5 +1,7 @@
 use erlangrt::command_line_args::{ErlStartArgs};
 use std::env;
+use log::info;
+use env_logger::{Builder, Env};
 
 // const ERLNAME: &'static str = "erl";
 
@@ -26,6 +28,8 @@ impl CtStartArgs {
 }
 
 fn main() {
+  Builder::from_env(Env::default().default_filter_or("info")).init();
+
   let in_args: Vec<String> = env::args().collect();
   let mut erl_args = ErlStartArgs::new(&in_args);
   erl_args.populate_with(in_args.iter());
@@ -150,12 +154,13 @@ fn main() {
     "otp/lib/stdlib/ebin/".to_string(),
   ];
 
-  //  println!("{:?}", cmd);
-  //  let mut child = cmd.spawn().unwrap();
-  //  let exit_status = child.wait().unwrap();
-  //  println!("erl exit status: {}", exit_status);
+  // debug!("{:?}", cmd);
+  // let mut child = cmd.spawn().unwrap();
+  // let exit_status = child.wait().unwrap();
+  // debug!("erl exit status: {}", exit_status);
+  info!("Starting emulator with erl_args: {:?}", erl_args);
   erlangrt::lib_main::start_emulator(&mut erl_args);
-  println!("ct_run: Finished.");
+  info!("ct_run: Finished.");
 }
 
 fn add_script_start(args: &mut ErlStartArgs) {

@@ -8,6 +8,7 @@ use crate::{
   term::*,
 };
 use colored::Colorize;
+use log::{error, warn};
 use std::collections::{HashMap, VecDeque};
 
 fn module() -> &'static str {
@@ -296,13 +297,13 @@ impl Scheduler {
       return ScheduleHint::TakeAnotherProcess;
     }
 
-    println!("Catching {}:{}", p_error.0, p_error.1);
-    println!("{}", proc.context);
+    warn!("Catching {}:{}", p_error.0, p_error.1);
+    warn!("{}", proc.context);
     proc.get_heap().stack_dump();
 
     match unsafe { proc.get_heap().unroll_stack_until_catch() } {
       Some(next_catch) => {
-        println!("Catch found: {:p}", next_catch.loc);
+        warn!("Catch found: {:p}", next_catch.loc);
         proc.context.set_x(0, Term::non_value());
         proc.context.set_x(1, p_error.0.to_atom());
         proc.context.set_x(2, p_error.1);
@@ -316,7 +317,7 @@ impl Scheduler {
       }
 
       None => {
-        println!("Catch not found, terminating...");
+        warn!("Catch not found, terminating...");
         if proc.process_flags.get(process_flags::TRAP_EXIT) {
           panic!("todo: on terminate implement trap_exit");
         }
@@ -357,7 +358,7 @@ impl Scheduler {
     // TODO: notify links
     // TODO: unregister name if registered
     // TODO: if pending timers - become zombie and sit in pending timers queue
-    println!(
+    error!(
       "{}Terminating pid {} reason={}:{}",
       module(),
       pid,

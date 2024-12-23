@@ -1,3 +1,5 @@
+use log::debug;
+
 use crate::{
   beam::loader::{LoaderState, PatchLocation},
   fail::RtResult,
@@ -7,6 +9,8 @@ use crate::{
 impl LoaderState {
   /// Analyze the code and replace label values with known label locations.
   pub fn fix_labels(&mut self) -> RtResult<()> {
+    debug!("fix_labels");
+    
     // Postprocess self.replace_labels, assuming that at this point labels exist
     let mut repl = Vec::<PatchLocation>::new();
     core::mem::swap(&mut repl, &mut self.replace_labels);

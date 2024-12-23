@@ -6,3 +6,5 @@ edition = "2018"
 
 [dependencies]
 erlangrt = {path = "../lib-erlangrt"}
+log = "0.4"
+env_logger = "0.9"

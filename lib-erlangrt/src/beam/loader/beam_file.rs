@@ -5,6 +5,7 @@ use std::{
 
 use bytes::Bytes;
 use compress::zlib;
+use log::debug;
 
 use crate::{
   beam::{
@@ -99,7 +100,7 @@ impl BeamFile {
       let chunk_sz = r.read_u32be();
       let pos_begin = r.pos();
 
-      // println!("Chunk {}", chunk_h);
+      debug!("Chunk {}", chunk_h);
       match chunk_h.as_ref() {
         "Atom" => beam_file.load_atoms_latin1(&mut r),
         "Attr" => beam_file.load_attributes(&mut r)?,
@@ -174,13 +175,13 @@ impl BeamFile {
 
   /// Load the `Code` section
   fn load_code(&mut self, r: &mut BinaryReader, chunk_sz: defs::Word) -> RtResult<()> {
-    let _code_ver = r.read_u32be();
-    let _min_opcode = r.read_u32be();
+    let code_ver = r.read_u32be();
+    let min_opcode = r.read_u32be();
     let max_opcode = r.read_u32be();
-    let _n_labels = r.read_u32be();
-    let _n_funs = r.read_u32be();
-    // println!("Code section version {}, opcodes {}-{}, labels: {}, funs: {}",
-    //  code_ver, min_opcode, max_opcode, n_labels, n_funs);
+    let n_labels = r.read_u32be();
+    let n_funs = r.read_u32be();
+    debug!("Code section version {}, opcodes {}-{}, labels: {}, funs: {}",
+      code_ver, min_opcode, max_opcode, n_labels, n_funs);
 
     if max_opcode > gen_op::OPCODE_MAX.get() as u32 {
       let msg = "BEAM file comes from a never and unsupported OTP version".to_string();

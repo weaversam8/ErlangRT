@@ -1,3 +1,5 @@
+use log::debug;
+
 use crate::{
   beam::loader::LoaderState,
   emulator::{atom, code_srv::CodeServer, function::FunEntry, mfa::ModFunArity},
@@ -9,6 +11,8 @@ fn module() -> &'static str {
 
 impl LoaderState {
   pub fn stage2_register_atoms(&mut self, code_server: &mut CodeServer) {
+    debug!("stage2_register_atoms");
+
     self.vm_atoms.reserve(self.beam_file.atoms.len());
     for a in &self.beam_file.atoms {
       self.vm_atoms.push(atom::from_str(a));
@@ -23,7 +27,7 @@ impl LoaderState {
     for rf in &self.beam_file.lambdas {
       let fun_name = self.atom_from_loadtime_index(rf.fun_atom_i);
       let mfa = ModFunArity::new(self.module_name(), fun_name, rf.arity);
-      println!("{}stage2_fill_lambdas mfa={}", module(), mfa);
+      debug!("stage2_fill_lambdas mfa={}", mfa);
       self.lambdas.push(FunEntry::new(mfa, rf.nfrozen))
     }
   }

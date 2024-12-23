@@ -1,3 +1,5 @@
+use log::{debug, trace};
+
 use crate::{
   beam::{gen_op, loader::LoaderState},
   emulator::{
@@ -13,6 +15,8 @@ impl LoaderState {
   /// Analyze the code and for certain opcodes overwrite their import index
   /// args with direct pointer to import heap.
   pub fn setup_imports(&mut self) -> RtResult<()> {
+    debug!("setup_imports");
+    
     // Step 1
     // Write imports onto literal heap as {Mod, Fun, Arity} triplets
     //
@@ -21,7 +25,7 @@ impl LoaderState {
       let mod_atom = self.atom_from_loadtime_index(ri.mod_atom_i);
       let fun_atom = self.atom_from_loadtime_index(ri.fun_atom_i);
       let mf_arity = ModFunArity::new(mod_atom, fun_atom, ri.arity);
-      // println!("is_bif {} for {}", is_bif, mf_arity);
+      // trace!("is_bif {} for {}", is_bif, mf_arity);
       let boxed_import =
         unsafe { boxed::Import::create_into(&mut self.beam_file.lit_heap, mf_arity)? };
 

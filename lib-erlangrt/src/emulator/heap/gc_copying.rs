@@ -1,6 +1,8 @@
 //! Copying Garbage Collector
 //! A simple implementation of half-heap copying (evicting) garbage collector
 //! somewhat similar to what is used in Erlang/OTP.
+use log::debug;
+
 use crate::{
   emulator::heap::{gc_trait::TGc, heap_trait::THeap, *},
   fail::RtResult,
@@ -19,7 +21,7 @@ impl TGc for CopyingGc {
     mut walker: HeapWalker,
     mut roots: Box<dyn TRootIterator>,
   ) -> RtResult<()> {
-    println!("Copying GC");
+    debug!("Copying GC");
 
     roots.roots_begin();
     loop {
@@ -27,7 +29,7 @@ impl TGc for CopyingGc {
       if r.is_null() {
         break;
       }
-      println!("root: {:?}", unsafe { *r });
+      debug!("root: {:?}", unsafe { *r });
     }
 
     loop {
@@ -36,7 +38,7 @@ impl TGc for CopyingGc {
         break;
       }
       let pval = unsafe { Term::from_raw(*p) };
-      println!("Heapwalker: {pval}");
+      debug!("Heapwalker: {pval}");
     }
 
     unimplemented!("Copying GC: Done")

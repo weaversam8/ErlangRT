@@ -1,5 +1,7 @@
 use core::cmp::Ordering;
 
+use log::debug;
+
 use crate::{
   defs::TDataReader,
   emulator::atom,
@@ -197,7 +199,7 @@ fn cmp_type_order(a: Term, b: Term) -> Ordering {
 fn cmp_terms_primary(a: Term, b: Term, exact: bool) -> RtResult<EqResult> {
   let a_prim_tag = a.get_term_tag();
   let b_prim_tag = b.get_term_tag();
-  // println!("cmp {} tag={:?} vs {} tag={:?}", a, a_prim_tag, b, b_prim_tag);
+  debug!("cmp {} tag={:?} vs {} tag={:?}", a, a_prim_tag, b, b_prim_tag);
 
   if a_prim_tag != b_prim_tag {
     // different primary types, compare their classes
@@ -408,8 +410,8 @@ unsafe fn cmp_binary(a: Term, b: Term) -> RtResult<Ordering> {
     return Ok(a_size.cmp(&b_size));
   }
 
-  println!("Going to compare {a} ? {b}");
-  println!(
+  debug!("Going to compare {a} ? {b}");
+  debug!(
     "sizes - {a_size} {} vs {b_size} {}",
     (*a_trait).get_byte_size(),
     (*b_trait).get_byte_size()

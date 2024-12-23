@@ -7,21 +7,25 @@ use std::{
   io::{stdout, Write},
   thread, time,
 };
+use log::{info};
 
 /// Entry point for the command-line interface. Pre-parse command line args
 /// by calling StartArgs methods, or just use default constructed StartArgs.
 pub fn start_emulator(args: &mut ErlStartArgs) {
   if cfg!(feature = "r20") {
-    println!("Erlang Runtime (compat OTP 20)");
+    info!("Erlang Runtime (compat OTP 20)");
   }
   if cfg!(feature = "r21") {
-    println!("Erlang Runtime (compat OTP 21)");
+    info!("Erlang Runtime (compat OTP 21)");
   }
   if cfg!(feature = "r22") {
-    println!("Erlang Runtime (compat OTP 22)");
+    info!("Erlang Runtime (compat OTP 22)");
+  }
+  if cfg!(feature = "r25") {
+    info!("Erlang Runtime (compat OTP 25)");
   }
   if cfg!(feature = "r27") {
-    println!("Erlang Runtime (compat OTP 27)");
+    info!("Erlang Runtime (compat OTP 27)");
   }
 
   let mut beam_vm = VM::new(args);
@@ -40,7 +44,7 @@ pub fn start_emulator(args: &mut ErlStartArgs) {
     .create_process(Term::nil(), &mfargs, &SpawnOptions::default())
     .unwrap();
 
-  println!("Process created. Entering main loop...");
+  info!("Process created. Entering main loop...");
   while beam_vm.tick().unwrap() {
     thread::sleep(time::Duration::from_millis(0));
   }

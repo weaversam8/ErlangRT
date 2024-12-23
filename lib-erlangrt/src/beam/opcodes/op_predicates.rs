@@ -1,6 +1,7 @@
 use core::cmp::Ordering;
 
 use colored::Colorize;
+use log::debug;
 
 use crate::{
   beam::disp_result::DispatchResult,
@@ -98,7 +99,7 @@ fn generic_comparison(
   // Not flag is xor-ed with result =/= desired
   if (result != desired_result) ^ (invert == CmpInvert::Not) {
     if cfg!(feature = "trace_comparisons") {
-      println!(
+      debug!(
         "Comparison {} {:?} {} ? {} => {:?} (desired {:?} {:?})",
         "failed".red(),
         exact,

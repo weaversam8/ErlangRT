@@ -1,5 +1,7 @@
 //! Module implements opcodes related to execution control: Calls, jumps,
 //! returns etc.
+use log::debug;
+
 use crate::{
   beam::disp_result::DispatchResult,
   defs::exc_type::ExceptionType,
@@ -268,7 +270,7 @@ impl OpcodeFuncInfo {
     arity: usize,
   ) -> RtResult<DispatchResult> {
     if cfg!(debug_assertions) {
-      println!("{}function_clause {}:{}/{}", module(), m, f, arity);
+      debug!("{}function_clause {}:{}/{}", module(), m, f, arity);
       proc.context.dump_registers(arity);
     }
     Err(RtErr::Exception(

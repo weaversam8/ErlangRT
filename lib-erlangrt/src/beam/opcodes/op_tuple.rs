@@ -1,4 +1,6 @@
 //! Module implements opcodes related to tuple creation and manipulation.
+use log::debug;
+
 use crate::{
   beam::{disp_result::DispatchResult, gen_op::OPCODE_PUT},
   emulator::{code::opcode, heap::THeapOwner, process::Process, runtime_ctx::*},
@@ -39,7 +41,7 @@ impl OpcodePutTuple {
       let val = ctx.op_arg_load_term_at(0, hp);
       ctx.ip_advance(2);
 
-      // println!("- put {}, {}", i, val);
+      debug!("- put {}, {}", i, val);
       unsafe {
         (*tuple_p).set_element(i, val);
       }
