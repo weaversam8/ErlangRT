@@ -3,7 +3,7 @@
 use core::{fmt, ptr, slice};
 
 use colored::Colorize;
-use log::debug;
+use log::{debug, trace};
 
 use crate::{
   beam::gen_op,
@@ -86,7 +86,7 @@ impl RuntimeContext {
   #[inline]
   pub fn return_and_clear_cp(&mut self, proc: &Process) -> ReturnResult {
     if cfg!(feature = "trace_calls") {
-      debug!("{} x0={}", "Return:".yellow(), self.get_x(0));
+      trace!("{} x0={}", "Return:".yellow(), self.get_x(0));
     }
     if self.cp.is_null() {
       if proc.get_heap().stack_depth() == 0 {
@@ -122,7 +122,7 @@ impl RuntimeContext {
   #[inline]
   pub fn set_x(&mut self, index: usize, val: Term) {
     if cfg!(feature = "trace_register_changes") {
-      debug!("{}{} = {}", "set x".blue(), index, val);
+      trace!("{}{} = {}", "set x".blue(), index, val);
     }
     // debug_assert!(val.is_value(), "Should never set x[] to a #Nonvalue<>");
     self.regs[index] = val;
@@ -302,7 +302,7 @@ impl RuntimeContext {
   #[inline]
   pub fn jump(&mut self, cp: Term) {
     debug_assert!(cp.is_cp());
-    debug!("{} {:p}", "jump to".purple(), cp.get_cp_ptr::<Word>());
+    trace!("{} {:p}", "jump to".purple(), cp.get_cp_ptr::<Word>());
     self.ip = CodePtr::from_cp(cp);
   }
 
@@ -310,7 +310,7 @@ impl RuntimeContext {
   pub fn jump_ptr(&mut self, code_ptr: *const Word) {
     debug_assert!(!code_ptr.is_null(), "Jumping to NULL is a bad idea");
     if cfg!(feature = "trace_opcode_execution") {
-      debug!("{} {:p}", "jump to".purple(), code_ptr);
+      trace!("{} {:p}", "jump to".purple(), code_ptr);
     }
     self.ip = CodePtr::from_ptr(code_ptr);
   }
@@ -348,7 +348,7 @@ impl RuntimeContext {
     }
 
     for i in 0..arity {
-      debug!("reg X[{}] = {}", i, self.get_x(i));
+      trace!("reg X[{}] = {}", i, self.get_x(i));
     }
   }
 
@@ -361,14 +361,14 @@ impl RuntimeContext {
     arity: usize,
   ) {
     if cfg!(feature = "trace_calls") {
-      print!("{} <{}>, x[..{}] <", "Call".yellow(), description, arity);
+      trace!("{} <{}>, x[..{}] <", "Call".yellow(), description, arity);
       for i in offset..(offset + arity) {
         if i > 0 {
-          print!("{}", "; ".red());
+          trace!("{}", "; ".red());
         }
-        print!("{}", self.get_x(i));
+        trace!("{}", self.get_x(i));
       }
-      println!(">");
+      trace!(">");
     }
   }
 }

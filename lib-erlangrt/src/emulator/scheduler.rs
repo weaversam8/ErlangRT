@@ -8,7 +8,7 @@ use crate::{
   term::*,
 };
 use colored::Colorize;
-use log::{error, warn};
+use log::{debug, error, info, warn};
 use std::collections::{HashMap, VecDeque};
 
 fn module() -> &'static str {
@@ -156,13 +156,13 @@ impl Scheduler {
   fn log_next_process(maybe_pid: Option<Term>) {
     if cfg!(feature = "trace_opcode_execution") {
       if let Some(pid) = maybe_pid {
-        println!(
-          "+ {} {} --- --- --- --- --- --- ---",
+        debug!(
+          "+ {} {} ---------",
           "Scheduler: switching to".yellow().on_blue(),
           pid
         );
       } else {
-        println!(
+        debug!(
           "+ {}",
           "Scheduler: no process to run".yellow().on_bright_black()
         );
@@ -358,9 +358,8 @@ impl Scheduler {
     // TODO: notify links
     // TODO: unregister name if registered
     // TODO: if pending timers - become zombie and sit in pending timers queue
-    error!(
-      "{}Terminating pid {} reason={}:{}",
-      module(),
+    info!(
+      "Terminating pid {} reason={}:{}",
       pid,
       e.0,
       e.1 //, p.runtime_ctx.regs[0]

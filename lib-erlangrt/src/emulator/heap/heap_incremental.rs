@@ -14,7 +14,7 @@ use crate::{
   term::{heap_walker::*, Term},
 };
 use colored::Colorize;
-use log::debug;
+use log::{debug, trace};
 use core::fmt;
 
 /// Default heap size for constants (literals) when loading a module.
@@ -115,7 +115,7 @@ impl<GC: TGc> THeap for IncrementalHeap<GC> {
       return Err(RtErr::StackIndexRange(index));
     }
     if cfg!(feature = "trace_stack_changes") {
-      debug!("{}{} = {}", "set y".green(), index, val);
+      trace!("{}{} = {}", "set y".green(), index, val);
     }
     self.data[index + self.stack_top + 1] = val.raw();
     Ok(())
@@ -194,7 +194,7 @@ impl<GC: TGc> THeap for IncrementalHeap<GC> {
   #[inline]
   fn stack_push_lterm_unchecked(&mut self, val: Term) {
     if cfg!(feature = "trace_stack_changes") {
-      debug!("{} {}", "push (unchecked)".green(), val);
+      trace!("{} {}", "push (unchecked)".green(), val);
     }
     self.stack_top -= 1;
     self.data[self.stack_top] = val.raw();

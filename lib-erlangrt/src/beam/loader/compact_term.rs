@@ -1,16 +1,18 @@
 //! Module implements decoder for compact term format used in BEAM files.
 //! <http://beam-wisdoms.clau.se/en/latest/indepth-beam-file.html#beam-compact-term-encoding>
 
+use log::debug;
+
 use crate::{
-  beam::loader::CompactTermError,
+  beam::{gen_op, loader::CompactTermError},
   big,
   defs::{self, Word},
-  emulator::heap::Heap,
+  emulator::{code::RawOpcode, heap::Heap},
   fail::{RtErr, RtResult},
   rt_util::bin_reader::BinaryReader,
   term::{
     boxed::{self, bignum::sign::Sign, endianness::Endianness},
-    term_builder::{TupleBuilder, ListBuilder},
+    term_builder::{ListBuilder, TupleBuilder},
     Term,
   },
 };
@@ -72,6 +74,7 @@ enum CteAllocListType {
 pub enum ListParseMode {
   AsJumpTable,
   AsTuple2Initializer,
+  AsMakeFun3Initializer,
 }
 
 fn module() -> &'static str {
@@ -98,11 +101,13 @@ impl CompactTermReader {
   /// checked to have labels at even positions. Otherwise will
   /// create an initializer tuple (where register values are allowed)
   #[inline]
-  pub fn on_ext_list_create_jumptable(&mut self, b: bool) {
-    if b {
-      self.mode = ListParseMode::AsJumpTable
-    } else {
+  pub fn set_ext_list_mode(&mut self, op: RawOpcode) {
+    if op == gen_op::OPCODE_PUT_TUPLE2 {
       self.mode = ListParseMode::AsTuple2Initializer
+    } else if op == gen_op::OPCODE_MAKE_FUN3 {
+      self.mode = ListParseMode::AsMakeFun3Initializer
+    } else {
+      self.mode = ListParseMode::AsJumpTable
     }
   }
 
@@ -220,7 +225,8 @@ impl CompactTermReader {
         ListParseMode::AsJumpTable => self.parse_list_as_jump_table(reader),
         ListParseMode::AsTuple2Initializer => {
           self.parse_list_as_tuple_initializer(reader)
-        }
+        },
+        ListParseMode::AsMakeFun3Initializer => self.parse_list_as_make_fun3_initializer(reader),
       },
 
       // float does not exist after R19
@@ -263,6 +269,13 @@ impl CompactTermReader {
     }
     let msg = "compact_term: loadtime Literal index too big".to_string();
     Self::make_err(CompactTermError::ExtendedTag(msg))
+  }
+
+  fn parse_list_as_make_fun3_initializer(
+    &mut self,
+    reader: &mut BinaryReader,
+  ) -> RtResult<Term> {
+    panic!("Not implemented")
   }
 
   fn parse_list_as_tuple_initializer(
@@ -430,7 +443,7 @@ impl CompactTermReader {
         "Limbs vec can't be empty for creating a bigint"
       );
       let r = unsafe { boxed::Bignum::create_into(&mut (*self.heap), sign, &limbs)? };
-      println!("Creating bigint with {limbs:?}");
+      debug!("Creating bigint with {limbs:?}");
       Ok(Term::make_boxed(r))
     } // if larger than 11 bits
   }

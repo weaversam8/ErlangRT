@@ -4,6 +4,7 @@ ERLC=$(OTP_DIR)/bin/erlc
 # OTP_EMU_TEST_DIR=$(OTP_EMU_DIR)/test
 
 compile: \
+    basic.S basic.beam \
     test.S test.beam \
     test2.S test2.beam \
     ring.S ring.beam \

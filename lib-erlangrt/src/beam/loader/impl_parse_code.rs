@@ -72,7 +72,8 @@ impl LoaderState {
       while !reader.eof() {
         let op = RawOpcode(reader.read_u8());
         let arity = gen_op::opcode_arity(op) as usize;
-        ct_reader.on_ext_list_create_jumptable(op != gen_op::OPCODE_PUT_TUPLE2);
+        trace!("Parsing opcode {:>3} = {}/{}", RawOpcode::get(op), gen_op::opcode_name(op), gen_op::opcode_arity(op));
+        ct_reader.set_ext_list_mode(op);
         for _i in 0..arity {
           ct_reader.read(&mut reader)?;
         }
@@ -99,8 +100,7 @@ impl LoaderState {
       // let op = opcode::RawOpcode(r.read_u8());
       // let mut args: Vec<FTerm> = Vec::new();
       next_instr.next(reader.read_u8());
-      ct_reader
-        .on_ext_list_create_jumptable(next_instr.opcode != gen_op::OPCODE_PUT_TUPLE2);
+      ct_reader.set_ext_list_mode(next_instr.opcode);
       //  rtdbg!(
       //    "opcode {:?} {}",
       //    next_instr.opcode,

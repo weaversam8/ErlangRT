@@ -30,11 +30,21 @@ pub fn start_emulator(args: &mut ErlStartArgs) {
 
   let mut beam_vm = VM::new(args);
 
+  // start basic:start/0
   let mfargs = ModFunArgs::with_args_list(
-    atom::from_str("test2"),
-    atom::from_str("test"),
+    atom::from_str("basic"),
+    atom::from_str("start"),
     Term::nil(),
   );
+
+  // start test2:test/0
+  // let mfargs = ModFunArgs::with_args_list(
+  //   atom::from_str("test2"),
+  //   atom::from_str("test"),
+  //   Term::nil(),
+  // );
+  
+  // start init:boot/0
   //  let mfargs = ModFunArgs::with_args_list(
   //    atom::from_str("init"),
   //    atom::from_str("boot"),

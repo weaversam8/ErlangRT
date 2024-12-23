@@ -1,6 +1,6 @@
 use core::cmp::Ordering;
 
-use log::debug;
+use log::{debug, trace};
 
 use crate::{
   defs::TDataReader,
@@ -199,7 +199,7 @@ fn cmp_type_order(a: Term, b: Term) -> Ordering {
 fn cmp_terms_primary(a: Term, b: Term, exact: bool) -> RtResult<EqResult> {
   let a_prim_tag = a.get_term_tag();
   let b_prim_tag = b.get_term_tag();
-  debug!("cmp {} tag={:?} vs {} tag={:?}", a, a_prim_tag, b, b_prim_tag);
+  trace!("cmp {} tag={:?} vs {} tag={:?}", a, a_prim_tag, b, b_prim_tag);
 
   if a_prim_tag != b_prim_tag {
     // different primary types, compare their classes
