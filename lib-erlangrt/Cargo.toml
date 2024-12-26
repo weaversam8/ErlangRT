@@ -44,6 +44,7 @@ lazy_static = "1.4.0"
 byteorder = "1.4.3"
 log = "0.4"
 env_logger = "0.9"
+gc-arena = "0.5.3"
 
 [profile.dev]
 panic = "unwind"
